@@ -15,14 +15,12 @@ internal static class Calculator
 
         for (var i = 0; i < n; i++)
         {
-            if (token.IsCancellationRequested)
-            {
-                break;
-            }
+            token.ThrowIfCancellationRequested();
             // i + 1 is to allow 2147483647 (Max(Int32)) 
             sum = sum + (i + 1);
             await Task.Delay(10);
         }
+        Console.WriteLine($"Sum of {n} is {sum}");
         return sum;
     }
 }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading;
 using System.Threading.Tasks;
 using AsyncAwait.Task2.CodeReviewChallenge.Headers;
 using CloudServices.Interfaces;
@@ -23,20 +22,29 @@ public class StatisticMiddleware
     {
         string path = context.Request.Path;
 
-        var staticRegTask = Task.Run(
-            () => _statisticService.RegisterVisitAsync(path)
-                .ConfigureAwait(false)
-                .GetAwaiter().OnCompleted(UpdateHeaders));
-        Console.WriteLine(staticRegTask.Status); // just for debugging purposes
+        //var staticRegTask = Task.Run(
+        //    () => _statisticService.RegisterVisitAsync(path)
+        //        .ConfigureAwait(false)
+        //        .GetAwaiter().OnCompleted(UpdateHeaders));
+        //Console.WriteLine(staticRegTask.Status); // just for debugging purposes
 
-        void UpdateHeaders()
+
+        await _statisticService.RegisterVisitAsync(path).ConfigureAwait(false);
+
+        await UpdateHeaders();
+
+        //Console.WriteLine(staticRegTask.Status); // just for debugging purposes
+
+        async Task UpdateHeaders()
         {
+            var count = await _statisticService.GetVisitsCountAsync(path);
             context.Response.Headers.Add(
                 CustomHttpHeaders.TotalPageVisits,
-                _statisticService.GetVisitsCountAsync(path).GetAwaiter().GetResult().ToString());
+                count.ToString());
         }
 
-        Thread.Sleep(3000); // without this the statistic counter does not work
+        //Thread.Sleep(3000); // without this the statistic counter does not work
+        await Task.Delay(3000);
         await _next(context);
     }
 }

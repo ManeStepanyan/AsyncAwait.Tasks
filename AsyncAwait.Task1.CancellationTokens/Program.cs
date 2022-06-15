@@ -56,20 +56,24 @@ internal class Program
 
         var sum = Calculator.Calculate(n, token);
 
+        Console.WriteLine();
+        Console.WriteLine($"The task for {n} started... Enter N to cancel the request:");
+
         var input = Console.ReadLine();
 
-        if(int.TryParse(input, out var N))
+        if (int.TryParse(input, out var N))
         {
-            source.Cancel();
-            Console.WriteLine($"Sum for {n} cancelled...");
+            if (!sum.IsCompleted)
+            {
+                source.Cancel();
+                Console.WriteLine($"Sum for {n} cancelled...");
+            }
+            await CalculateSum(N);
         }
-
-        Console.WriteLine();
+        else
+        {
+            Console.WriteLine($"Invalid integer: '{input}'. Please try again.");
+        }
         Console.WriteLine("Enter N: ");
-
-        // todo: add code to process cancellation and uncomment this line    
-        // Console.WriteLine($"Sum for {n} cancelled...");
-
-        Console.WriteLine($"The task for {n} started... Enter N to cancel the request:");
     }
 }
